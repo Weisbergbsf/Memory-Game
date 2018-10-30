@@ -6,73 +6,77 @@ Game.MemoryGame = (function () {
 
     function MemoryGame() {
         this.card = $('.card');
+        this.deck = $('.deck')
     }
 
     MemoryGame.prototype.start = function () {
         let cards = [...this.card];
         startGame(cards);
-
         this.card.on('click', onClickCard.bind(this));
-
-
     }
 
     function startGame(cards) {
-
         cards = shuffle(cards);
+        cards.map((card) => { $('.deck').append(card); })
         cards.map((card) => card.classList.remove('open', 'show', 'match', 'disabled'))
-
     }
 
-    function onClickCard(event) {
-        facingCards.push(event.currentTarget)
+    function onClickCard() {
+        if (facingCards.length <= 1){
+            compareCards(event);
+        }
+    }
+
+    function compareCards(event) {
+        
+        if (facingCards.length <= 1){
+            facingCards.push(event.currentTarget)
+        }
         showCard(event);
-        console.log('cliquei..', event.currentTarget, 'size arrya facingCards: ', facingCards);
-
+        $(event.currentTarget).unbind( "click" );
+       
         if (facingCards.length === 2) {
-
+            $(event.currentTarget).off("click");
             if (facingCards[0].type === facingCards[1].type) {
-
-                console.log('combina ', facingCards[0], ' - ', facingCards[1], '     =>  ', facingCards)
-                //$(event.currentTarget).addClass('open show animated bounceOut faster');
                 matched();
-                facingCards = [];
             }
             else {
-
-                //$(facingCards[0]).removeClass('delay-5s open show animated flipInY disabled');
-                //$(facingCards[1]).removeClass('delay-5s open show animated flipInY disabled');
-
-                setTimeout(() => {
-                    unmatched
-                    console.log("setTimeout called!")
-                }, 1000);
-                facingCards = [];
+                unmatched();
             }
         }
-
     }
 
     function showCard(event) {
-        $(event.currentTarget).addClass('open show animated flipInY faster disabled');
+        $(event.currentTarget).addClass('open show animated flipInY faster ');
     }
-    function matched() { 
+
+    function matched() {
         $(facingCards[0]).removeClass('flipInY faster');
         $(facingCards[1]).removeClass('flipInY faster');
 
-        $(facingCards[0]).addClass('match bounceIn disabled');
-        $(facingCards[1]).addClass('match bounceIn disabled');
+        $(facingCards[0]).addClass('match bounceIn ');
+        $(facingCards[1]).addClass('match bounceIn ');
+        
+        //Disable event click
+        $(facingCards[0]).unbind();
+        $(facingCards[1]).unbind();
+        facingCards = [];
     }
+
     function unmatched() {
-
-        let style = 'open show animated flipInY faster disabled'
-
-        $(facingCards[0]).removeClass('open show animated flipInY faster disabled');
-        $(facingCards[1]).removeClass('open show animated flipInY faster disabled');
-
+        //Enable event click
+        $(facingCards[0]).bind("click", onClickCard);
+        $(facingCards[1]).bind("click", onClickCard);
+        $(facingCards[0]).addClass('animated bounceIn ');
+        $(facingCards[1]).addClass('animated bounceIn ');
+        setTimeout(() => {
+            let style = 'delay-5s bounceIn open show animated flipInY faster '
+            $(facingCards[0]).removeClass(style);
+            $(facingCards[1]).removeClass(style);
+            facingCards = [];
+        }, 1000);
     }
-
-
+    
     function shuffle(array) {
         var currentIndex = array.length, temporaryValue, randomIndex;
 
