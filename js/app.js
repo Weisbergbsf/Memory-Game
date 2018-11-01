@@ -2,29 +2,41 @@ var Game = Game || {}
 
 Game.MemoryGame = (function () {
 
+    let cards = null;
     let facingCards = [];
+    let count = 0;
+    let cardsMatched = 0;
 
     function MemoryGame() {
         this.card = $('.card');
-        this.deck = $('.deck')
+        this.restart = $('.restart');
+        
     }
 
     MemoryGame.prototype.start = function () {
-        let cards = [...this.card];
-        startGame(cards);
+        cards = [...this.card];
+        startGame();
         this.card.on('click', onClickCard.bind(this));
+        this.restart.on('click', restartGame.bind(this));
     }
 
-    function startGame(cards) {
+    function restartGame() {
+        startGame();
+        cards.map( card => { $(card).off('click').on('click',onClickCard); })
+    }
+
+    function startGame() {
+        count = 0;
         cards = shuffle(cards);
         cards.map((card) => { $('.deck').append(card); })
-        cards.map((card) => card.classList.remove('open', 'show', 'match', 'disabled'))
+        cards.map((card) => card.classList.remove('open', 'show', 'match', 'disabled', "animated", "bounceIn"))
     }
 
     function onClickCard() {
         if (facingCards.length <= 1){
             compareCards(event);
         }
+        console.log('cardsMatched ', cardsMatched)
     }
 
     function compareCards(event) {
@@ -33,10 +45,10 @@ Game.MemoryGame = (function () {
             facingCards.push(event.currentTarget)
         }
         showCard(event);
-        $(event.currentTarget).unbind( "click" );
        
         if (facingCards.length === 2) {
-            $(event.currentTarget).off("click");
+            totalCardsClicked();
+            
             if (facingCards[0].type === facingCards[1].type) {
                 matched();
             }
@@ -48,9 +60,13 @@ Game.MemoryGame = (function () {
 
     function showCard(event) {
         $(event.currentTarget).addClass('open show animated flipInY faster ');
+        //Block the click of the first card to prevent it from being compared to itself.
+        $(event.currentTarget).off( "click" )
     }
 
     function matched() {
+        
+        
         $(facingCards[0]).removeClass('flipInY faster');
         $(facingCards[1]).removeClass('flipInY faster');
 
@@ -58,25 +74,49 @@ Game.MemoryGame = (function () {
         $(facingCards[1]).addClass('match bounceIn ');
         
         //Disable event click
-        $(facingCards[0]).unbind();
-        $(facingCards[1]).unbind();
+        $(facingCards[0]).off("click", onClickCard);
+        $(facingCards[1]).off("click", onClickCard);
+
         facingCards = [];
+
+        finishGame();
+    }
+
+    function finishGame() {
+        cardsMatched++;
+
+        
+        
+        if(cardsMatched === 8) {
+            $('.score-panel').addClass('hide');
+            $('.deck').addClass('hide');
+            // TODO: Show score and button play again
+        }
     }
 
     function unmatched() {
         //Enable event click
-        $(facingCards[0]).bind("click", onClickCard);
-        $(facingCards[1]).bind("click", onClickCard);
-        $(facingCards[0]).addClass('animated bounceIn ');
-        $(facingCards[1]).addClass('animated bounceIn ');
+        $(facingCards[0]).on("click", onClickCard);
+        $(facingCards[1]).on("click", onClickCard);
+
+
+        $(facingCards[0]).removeClass('flipInY faster');
+        $(facingCards[1]).removeClass('flipInY faster');
+        $(facingCards[0]).addClass('animated shake unmatch');
+        $(facingCards[1]).addClass('animated shake unmatch');
         setTimeout(() => {
-            let style = 'delay-5s bounceIn open show animated flipInY faster '
+            let style = 'delay-5s bounceIn open show animated shake faster unmatch'
             $(facingCards[0]).removeClass(style);
             $(facingCards[1]).removeClass(style);
             facingCards = [];
         }, 1000);
     }
-    
+
+    function totalCardsClicked() {
+        count++
+        $('.moves').text(count);
+    }
+
     function shuffle(array) {
         var currentIndex = array.length, temporaryValue, randomIndex;
 
@@ -99,29 +139,3 @@ $(function () {
     var game = new Game.MemoryGame();
     game.start();
 })
-
-/*
- * Create a list that holds all of your cards
- */
-
-/*
- * Display the cards on the page
- *   - shuffle the list of cards using the provided "shuffle" method below
- *   - loop through each card and create its HTML
- *   - add each card's HTML to the page
- */
-
-// Shuffle function from http://stackoverflow.com/a/2450976
-
-
-
-/*
- * set up the event listener for a card. If a card is clicked:
- *  - display the card's symbol (put this functionality in another function that you call from this one)
- *  - add the card to a *list* of "open" cards (put this functionality in another function that you call from this one)
- *  - if the list already has another card, check to see if the two cards match
- *    + if the cards do match, lock the cards in the open position (put this functionality in another function that you call from this one)
- *    + if the cards do not match, remove the cards from the list and hide the card's symbol (put this functionality in another function that you call from this one)
- *    + increment the move counter and display it on the page (put this functionality in another function that you call from this one)
- *    + if all cards have matched, display a message with the final score (put this functionality in another function that you call from this one)
- */
