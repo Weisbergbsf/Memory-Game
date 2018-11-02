@@ -91,6 +91,22 @@ h1 {
     display: block;
 }
 
+.swal-button {
+    padding: 14px 24px;
+    border-radius: 5px;
+    color: #fff;
+    background-color: #28a745;
+    border: none;
+    border-radius: 5px;
+    margin: 0 auto;
+    display: block;
+}
+.swal-button-container {
+    margin: 0 auto;
+    display: block;
+    position: relative;
+}
+
 /*
  * Styles for the Score Panel
  */

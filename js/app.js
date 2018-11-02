@@ -10,7 +10,6 @@ Game.MemoryGame = (function () {
     function MemoryGame() {
         this.card = $('.card');
         this.restart = $('.restart');
-        
     }
 
     MemoryGame.prototype.start = function () {
@@ -20,26 +19,26 @@ Game.MemoryGame = (function () {
         this.restart.on('click', restartGame.bind(this));
     }
 
-    function restartGame() {
+    restartGame = () => {
         startGame();
         cards.map( card => { $(card).off('click').on('click',onClickCard); })
     }
 
-    function startGame() {
+    startGame = () => {
         count = 0;
+        $('.moves').text(count);
         cards = shuffle(cards);
         cards.map((card) => { $('.deck').append(card); })
-        cards.map((card) => card.classList.remove('open', 'show', 'match', 'disabled', "animated", "bounceIn"))
+        cards.map((card) => card.classList.remove('open', 'show', 'match', 'disabled', 'animated', 'bounceIn', 'hide'))
     }
 
-    function onClickCard() {
+    onClickCard = () => {
         if (facingCards.length <= 1){
             compareCards(event);
         }
-        console.log('cardsMatched ', cardsMatched)
     }
 
-    function compareCards(event) {
+    compareCards = (event) => {
         
         if (facingCards.length <= 1){
             facingCards.push(event.currentTarget)
@@ -58,15 +57,13 @@ Game.MemoryGame = (function () {
         }
     }
 
-    function showCard(event) {
+    showCard = (event) => {
         $(event.currentTarget).addClass('open show animated flipInY faster ');
         //Block the click of the first card to prevent it from being compared to itself.
         $(event.currentTarget).off( "click" )
     }
 
-    function matched() {
-        
-        
+    matched = () => {
         $(facingCards[0]).removeClass('flipInY faster');
         $(facingCards[1]).removeClass('flipInY faster');
 
@@ -82,23 +79,31 @@ Game.MemoryGame = (function () {
         finishGame();
     }
 
-    function finishGame() {
+    finishGame = () => {
         cardsMatched++;
-
-        
         
         if(cardsMatched === 8) {
             $('.score-panel').addClass('hide');
             $('.deck').addClass('hide');
-            // TODO: Show score and button play again
+            
+            swal({
+                title: "Good job!",
+                text: `With ${count} moves.`,
+                icon: "success",
+                button: "Play again!",
+              }).then(() => {
+                  cardsMatched = 0;
+                  $('.score-panel').removeClass('hide');
+                  $('.deck').removeClass('hide');
+                  restartGame();
+              });
         }
     }
 
-    function unmatched() {
+    unmatched = () => {
         //Enable event click
         $(facingCards[0]).on("click", onClickCard);
         $(facingCards[1]).on("click", onClickCard);
-
 
         $(facingCards[0]).removeClass('flipInY faster');
         $(facingCards[1]).removeClass('flipInY faster');
@@ -112,12 +117,12 @@ Game.MemoryGame = (function () {
         }, 1000);
     }
 
-    function totalCardsClicked() {
+    totalCardsClicked = () => {
         count++
         $('.moves').text(count);
     }
 
-    function shuffle(array) {
+    shuffle = (array) => {
         var currentIndex = array.length, temporaryValue, randomIndex;
 
         while (currentIndex !== 0) {
@@ -135,7 +140,4 @@ Game.MemoryGame = (function () {
 
 }());
 
-$(function () {
-    var game = new Game.MemoryGame();
-    game.start();
-})
+$(() => { new Game.MemoryGame().start(); })
