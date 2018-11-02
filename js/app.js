@@ -27,9 +27,10 @@ Game.MemoryGame = (function () {
     startGame = () => {
         count = 0;
         $('.moves').text(count);
+        cardsMatched = 0;
         cards = shuffle(cards);
         cards.map((card) => { $('.deck').append(card); })
-        cards.map((card) => card.classList.remove('open', 'show', 'match', 'disabled', 'animated', 'bounceIn', 'hide'))
+        cards.map((card) => card.classList.remove('open', 'show', 'match', 'animated', 'bounceIn', 'hide'))
     }
 
     onClickCard = () => {
