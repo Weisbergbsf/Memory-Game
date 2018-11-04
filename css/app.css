@@ -106,6 +106,9 @@ h1 {
     display: block;
     position: relative;
 }
+.timer {
+    margin-left: 10px;
+}
 
 /*
  * Styles for the Score Panel
