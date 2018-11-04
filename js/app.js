@@ -215,4 +215,4 @@ Game.MemoryGame = (function () {
 
 }());
 
-$(() => { new Game.MemoryGame().start(); })
+$(() => { new Game.MemoryGame().start(); });
